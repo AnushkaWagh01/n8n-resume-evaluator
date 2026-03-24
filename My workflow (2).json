@@ -1,0 +1,537 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk",
+          "mode": "list",
+          "cachedResultName": "Resume Evaluations",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 767301588,
+          "mode": "list",
+          "cachedResultName": "Form responses 3",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk/edit#gid=767301588"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -160
+      ],
+      "id": "a88bfcb2-57ab-42a0-bdc4-414fa4b49431",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "fa9URZAZeGeXH7F3",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert HR recruiter.\n\nReturn ONLY a valid JSON object.\nNo explanation.\nNo markdown.\nNo ```json.\nNo extra text.\n\nOutput format:\n{\n  \"ats_score\": number,\n  \"skills_match\": number,\n  \"par_rating\": number,\n  \"experience_clarity\": number,\n  \"overall_grade\": \"A\" | \"B\" | \"C\" | \"D\",\n  \"top_strength\": string,\n  \"main_gap\": string,\n  \"recommendation\": \"Shortlist\" | \"Maybe\" | \"Reject\"\n}\n\nResume:\n{{ $json.text }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        320,
+        -160
+      ],
+      "id": "4658c61d-9d9b-4430-b2d0-6a6a98e109db",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        392,
+        64
+      ],
+      "id": "5892b12f-c94b-420d-b2df-2d69df23053d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "y5cpnDaRRhxmpXcY",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk",
+          "mode": "list",
+          "cachedResultName": "Resume Evaluations",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 767301588,
+          "mode": "list",
+          "cachedResultName": "Form responses 3",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk/edit#gid=767301588"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $item(0).$node[\"Google Sheets Trigger\"].json[\"Name\"] }}",
+            "Email": "={{ $item(0).$node[\"Google Sheets Trigger\"].json[\"Email\"] }}",
+            "ATS_Score": "={{ $json.ats_score }}",
+            "Skills_Match": "={{ $json.skills_match }}",
+            "PAR_Rating": "={{ $json.par_rating }}",
+            "Top_Strength": "={{ $json.top_strength }}",
+            "Processed": "={{ $json.Processed }}",
+            "Main_Gap": "={{ $json.main_gap }}",
+            "Recommendation": "={{ $json.recommendation }}",
+            "Timestamp": "={{ $item(0).$node[\"Google Sheets Trigger\"].json[\"Timestamp\"] }}",
+            "Experience_Clarity": "={{ $json.experience_clarity }}",
+            "Overall_Grade": "={{ $json.overall_grade }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Upload your resume (PDF ) ",
+              "displayName": "Upload your resume (PDF ) ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ATS_Score",
+              "displayName": "ATS_Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Skills_Match",
+              "displayName": "Skills_Match",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PAR_Rating",
+              "displayName": "PAR_Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Experience_Clarity",
+              "displayName": "Experience_Clarity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall_Grade",
+              "displayName": "Overall_Grade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Top_Strength",
+              "displayName": "Top_Strength",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Main_Gap",
+              "displayName": "Main_Gap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Processed",
+              "displayName": "Processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        -160
+      ],
+      "id": "749841f4-bfc1-4345-a129-e4ec9e5006a9",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "dDQ5Ezi39furLvyS",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let raw = item.json.text;\n\nif (!raw) {\n  return { json: { Processed: \"FAILED\" } };\n}\n\n// 🔥 Clean LLM output (removes ```json and formatting issues)\nlet clean = raw\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .replace(/\\n/g, \" \")\n  .trim();\n\nlet parsed;\n\ntry {\n  parsed = JSON.parse(clean);\n} catch (e) {\n  return {\n    json: {\n      Processed: \"FAILED\"\n    }\n  };\n}\n\n// ✅ Return clean structured data\nreturn {\n  json: {\n    ats_score: parsed.ats_score ?? \"\",\n    skills_match: parsed.skills_match ?? \"\",\n    par_rating: parsed.par_rating ?? \"\",\n    experience_clarity: parsed.experience_clarity ?? \"\",\n    overall_grade: parsed.overall_grade ?? \"\",\n    recommendation: parsed.recommendation ?? \"\",\n    top_strength: parsed.top_strength ?? \"\",\n    main_gap: parsed.main_gap ?? \"\",\n    Processed: \"YES\"\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -160
+      ],
+      "id": "7794d16d-90af-4ab2-ab15-14fa28eadb75",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json[\"Upload your resume (PDF ) \"].replace(\"https://drive.google.com/open?id=\", \"\") }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -128,
+        -160
+      ],
+      "id": "8dc807d4-16f8-4c11-aa41-2e2ea149168c",
+      "name": "Download file",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zXUUbAOMapuk5IGG",
+          "name": "Google Drive OAuth2 API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -160
+      ],
+      "id": "ec58b5ae-ffed-4dab-9f88-fea968f1475c",
+      "name": "Extract from pdf"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b7c4d171-672a-45f1-8434-b6608cfc719f",
+              "leftValue": "={{ $json[\"Upload your resume (PDF ) \"] }}\n→ is not empty",
+              "rightValue": "={{ $json[\"Upload your resume (PDF ) \"] }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "bf9b444d-dbf9-4adf-a26b-228c225ab669",
+              "leftValue": "={{ $json[\"Processed\"] }}\n→ is not equal to\n→ YES (Fixed)",
+              "rightValue": "=YES",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -352,
+        -160
+      ],
+      "id": "d2c05906-8311-47cd-bbbb-39bfb7cf8783",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e4763ae6-fc6f-4304-8d7a-679062419f3e",
+              "leftValue": "={{ $json.Recommendation }}",
+              "rightValue": "=Shortlist",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1120,
+        -160
+      ],
+      "id": "eb2f3d18-266b-472f-9a9f-a9bb240f5aaa",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "sendTo": "anushkavilaswagh@gmail.com",
+        "subject": "=🟢 New Shortlist Candidate — {{ $('Google Sheets Trigger').item.json[\"Name\"] }}",
+        "message": "=<h2 style=\"color:#22c55e;\">🟢 New Shortlist Candidate</h2>\n\n<table style=\"border-collapse:collapse; width:100%; font-family:Arial;\">\n  <tr style=\"background:#f1f5f9;\">\n    <td style=\"padding:8px; font-weight:bold;\">Candidate</td>\n    <td style=\"padding:8px;\">{{ $('Google Sheets Trigger').item.json[\"Name\"] }}</td>\n  </tr>\n  <tr>\n    <td style=\"padding:8px; font-weight:bold;\">Email</td>\n    <td style=\"padding:8px;\">{{ $('Google Sheets Trigger').item.json[\"Email\"] }}</td>\n  </tr>\n  <tr style=\"background:#f1f5f9;\">\n    <td style=\"padding:8px; font-weight:bold;\">ATS Score</td>\n    <td style=\"padding:8px;\">{{ $json.ATS_Score }} / 100</td>\n  </tr>\n  <tr>\n    <td style=\"padding:8px; font-weight:bold;\">Grade</td>\n    <td style=\"padding:8px;\">{{ $json.Overall_Grade }}</td>\n  </tr>\n  <tr style=\"background:#f1f5f9;\">\n    <td style=\"padding:8px; font-weight:bold;\">Top Strength</td>\n    <td style=\"padding:8px;\">{{ $json.Top_Strength }}</td>\n  </tr>\n  <tr>\n    <td style=\"padding:8px; font-weight:bold;\">Main Gap</td>\n    <td style=\"padding:8px;\">{{ $json.Main_Gap }}</td>\n  </tr>\n</table>\n\n<p style=\"margin-top:20px; color:#64748b; font-size:12px;\">\n  Sent automatically by Resume Evaluation Pipeline\n</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        -160
+      ],
+      "id": "890a4cb7-2eed-4ae1-8aa6-6022635205fc",
+      "name": "Send a message",
+      "webhookId": "7ae124f8-acc9-4734-b20b-ab3752a1a442",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "45lo6HDXfotF5rci",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from pdf": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "191a3a32-e666-4f52-beeb-a5ef1ab21306",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8668b25e517bb937b1fd35ac474b327bc525113fba28db2e82be3f87af524dc6"
+  },
+  "id": "8UNOqOphXdtNU6qY",
+  "tags": []
+}
