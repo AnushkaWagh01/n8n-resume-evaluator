@@ -1,0 +1,552 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk",
+          "mode": "list",
+          "cachedResultName": "Resume Evaluations",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 767301588,
+          "mode": "list",
+          "cachedResultName": "Form responses 3",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk/edit#gid=767301588"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        -1040
+      ],
+      "id": "a88bfcb2-57ab-42a0-bdc4-414fa4b49431",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "fa9URZAZeGeXH7F3",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a strict HR screening specialist hiring for a DATA ANALYST position. Your job is to evaluate resumes ONLY against Data Analyst role requirements. Be strict — only candidates with strong Data Analyst qualifications should pass.\n\nJOB ROLE: Data Analyst (Mid-Level)\n\nREQUIRED SKILLS (candidates MUST demonstrate proficiency in at least 4 of these):\n- SQL (writing complex queries, joins, subqueries, window functions)\n- Excel / Google Sheets (pivot tables, vlookup, advanced formulas, data cleaning)\n- Python or R (pandas, numpy, data manipulation, scripting)\n- Data Visualization (Tableau, Power BI, Looker, or matplotlib/seaborn)\n- Statistics & Analytics (hypothesis testing, regression, A/B testing, probability)\n- Business Intelligence tools and dashboard creation\n- ETL processes and data pipeline understanding\n\nPREFERRED QUALIFICATIONS:\n- Experience with cloud data warehouses (BigQuery, Snowflake, Redshift)\n- Knowledge of machine learning basics\n- Domain experience in business analytics or product analytics\n- Bachelor's degree in Statistics, Mathematics, Computer Science, Economics, or related field\n\nSCORING RULES:\n- ATS_Score (0-100): How well the resume is formatted for ATS. Check for clean formatting, standard headers, and DATA ANALYST specific keywords (SQL, data analysis, visualization, reporting, dashboards, KPIs, metrics).\n- Skills_Match (0-100): How many of the REQUIRED Data Analyst skills does the candidate have? Score 80+ ONLY if they have at least 4 required skills. Score below 40 if they have fewer than 2 required skills.\n- PAR_Rating (0-100): Does the candidate describe data analysis achievements using Problem-Action-Result format? Look for quantified impact like \"reduced reporting time by 30%\" or \"analyzed 1M+ records to identify trends.\"\n- Experience_Clarity (0-100): How clearly do they describe their data analyst or analytics experience? Check for specific tools mentioned, data volumes handled, stakeholder reporting, and clear timelines.\n\nOVERALL GRADE RULE (MANDATORY):\n- Overall_Grade = (ATS_Score + Skills_Match + PAR_Rating + Experience_Clarity) / 4, rounded to nearest integer. Do NOT assign an arbitrary grade.\n\nRECOMMENDATION RULE (STRICT):\n- \"Select\" ONLY if Overall_Grade >= 65 AND Skills_Match >= 60 (candidate must have genuine Data Analyst skills)\n- \"Reject\" if Overall_Grade < 65 OR Skills_Match < 60 (even if overall is high, weak DA skills = reject)\n\nTOP_STRENGTH RULE:\n- Must be the candidate's best POSITIVE Data Analyst related skill or achievement\n- NEVER use negative phrases like \"Lack of\", \"Missing\", \"No experience\"\n- Example: \"Strong SQL and Tableau dashboarding experience with 3 years in product analytics\"\n\nMAIN_GAP RULE:\n- Must describe the biggest MISSING Data Analyst skill or qualification\n- NEVER use status words like \"Reject\" or \"Select\"\n- Example: \"No Python/R experience and missing statistical analysis background\"\n\nReturn ONLY a valid JSON object, no other text:\n{\n  \"ATS_Score\": <number>,\n  \"Skills_Match\": <number>,\n  \"PAR_Rating\": <number>,\n  \"Experience_Clarity\": <number>,\n  \"Overall_Grade\": <number, average of above four>,\n  \"Recommendation\": \"<Select or Reject>\",\n  \"Top_Strength\": \"<best positive DA skill>\",\n  \"Main_Gap\": \"<biggest missing DA requirement>\"\n}\n\nResume text:\n{{ $json.text }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        112,
+        -880
+      ],
+      "id": "4658c61d-9d9b-4430-b2d0-6a6a98e109db",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk",
+          "mode": "list",
+          "cachedResultName": "Resume Evaluations",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 767301588,
+          "mode": "list",
+          "cachedResultName": "Form responses 3",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gFg_85it0OKT5G9JqqoYI3ePUVKDqnYYIK2YFRqsFJk/edit#gid=767301588"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "ATS_Score": "={{ $json.ATS_Score }}",
+            "Skills_Match": "={{ $json.Skills_Match }}",
+            "PAR_Rating": "={{ $json.PAR_Rating }}",
+            "Top_Strength": "={{ $json.Top_Strength }}",
+            "Processed": "={{ $json.Processed }}",
+            "Main_Gap": "={{ $json.Main_Gap }}",
+            "Recommendation": "={{ $json.Recommendation }}",
+            "Timestamp": "={{ $json.Timestamp }}",
+            "Experience_Clarity": "={{ $json.Experience_Clarity }}",
+            "Overall_Grade": "={{ $json.Overall_Grade }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Upload your resume (PDF ) ",
+              "displayName": "Upload your resume (PDF ) ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ATS_Score",
+              "displayName": "ATS_Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Skills_Match",
+              "displayName": "Skills_Match",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PAR_Rating",
+              "displayName": "PAR_Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Experience_Clarity",
+              "displayName": "Experience_Clarity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall_Grade",
+              "displayName": "Overall_Grade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Top_Strength",
+              "displayName": "Top_Strength",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Main_Gap",
+              "displayName": "Main_Gap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Processed",
+              "displayName": "Processed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        864,
+        -1024
+      ],
+      "id": "749841f4-bfc1-4345-a129-e4ec9e5006a9",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "dDQ5Ezi39furLvyS",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const original = $json;\n\n// Find the LLM output in the current item\nlet aiText = $json.text || $json.output || ($json.message && $json.message.content) || \"\";\n\nlet aiData = {};\ntry {\n  if (aiText) {\n    let raw = aiText;\n    // Remove markdown code blocks\n    raw = raw.replace(/```json\\n?/gi, '').replace(/```\\n?/gi, '').trim();\n    // Find JSON object in the text\n    const jsonMatch = raw.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n      aiData = JSON.parse(jsonMatch[0]);\n    }\n  }\n} catch (e) {\n  aiData = {};\n}\n\n// Helper to get value from multiple possible key names\nfunction getVal(obj, ...keys) {\n  for (const key of keys) {\n    if (obj[key] !== undefined && obj[key] !== null && obj[key] !== '') {\n      return obj[key];\n    }\n  }\n  return '';\n}\n\n// Normalize recommendation to proper case\nlet recommendation = getVal(aiData, 'Recommendation', 'recommendation', 'RECOMMENDATION');\nif (typeof recommendation === 'string') {\n  recommendation = recommendation.trim();\n  if (recommendation.toLowerCase() === 'select') recommendation = 'Select';\n  if (recommendation.toLowerCase() === 'reject') recommendation = 'Reject';\n}\n\nreturn {\n    Email: original.Email || '',\n    Name: original.Name || '',\n    Timestamp: original.Timestamp || '',\n    ATS_Score: getVal(aiData, 'ATS_Score', 'ats_score', 'ATSScore', 'ats'),\n    Skills_Match: getVal(aiData, 'Skills_Match', 'skills_match', 'SkillsMatch', 'skills'),\n    PAR_Rating: getVal(aiData, 'PAR_Rating', 'par_rating', 'PARRating', 'par'),\n    Experience_Clarity: getVal(aiData, 'Experience_Clarity', 'experience_clarity', 'ExperienceClarity', 'experience'),\n    Overall_Grade: getVal(aiData, 'Overall_Grade', 'overall_grade', 'OverallGrade', 'grade'),\n    Recommendation: recommendation,\n    Top_Strength: getVal(aiData, 'Top_Strength', 'top_strength', 'TopStrength', 'strength'),\n    Main_Gap: getVal(aiData, 'Main_Gap', 'main_gap', 'MainGap', 'gap'),\n    Processed: 'YES'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -1024
+      ],
+      "id": "7794d16d-90af-4ab2-ab15-14fa28eadb75",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json[\"Upload your resume (PDF ) \"].replace(\"https://drive.google.com/open?id=\", \"\") }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -336,
+        -864
+      ],
+      "id": "8dc807d4-16f8-4c11-aa41-2e2ea149168c",
+      "name": "Download file",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "zXUUbAOMapuk5IGG",
+          "name": "Google Drive OAuth2 API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        -880
+      ],
+      "id": "ec58b5ae-ffed-4dab-9f88-fea968f1475c",
+      "name": "Extract from pdf"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "faa0965d-19a9-40e1-9af5-4fdb2b05a853",
+              "leftValue": "={{ $json.Processed }}",
+              "rightValue": "YES",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -592,
+        -848
+      ],
+      "id": "d2c05906-8311-47cd-bbbb-39bfb7cf8783",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -656
+      ],
+      "id": "cd0ca5f9-b261-4ebd-9822-7638ba0ce0ee",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "JrxINy949qz5DKHO",
+          "name": "Groq account 12"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        480,
+        -1024
+      ],
+      "id": "ba7b63dc-d28b-456d-9219-79b71ca427fd",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dcbf7d54-ed20-4a4f-9ba2-3d65f92b9d09",
+              "leftValue": "={{ $json[\"Recommendation\"] }}",
+              "rightValue": "=Select",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1072,
+        -1024
+      ],
+      "id": "db6ed33f-3e8c-454c-a813-ed7d85d215de",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "sendTo": "anushkavilaswagh@gmail.com",
+        "subject": "=[HR Notification] New Shortlisted Candidate: {{ $json.Name }}",
+        "message": "=<h2 style=\"color:#2e7d32;\">New Shortlist Candidate</h2>\n<table style=\"border-collapse:collapse;width:100%;max-width:600px;\">\n<tr style=\"background:#f5f5f5;\"><td style=\"padding:8px;font-weight:bold;\">Candidate</td><td style=\"padding:8px;\">{{ $json[\"Name\"] }}</td></tr>\n<tr><td style=\"padding:8px;font-weight:bold;\">Email</td><td style=\"padding:8px;\">{{ $json[\"Email\"] }}</td></tr>\n<tr style=\"background:#f5f5f5;\"><td style=\"padding:8px;font-weight:bold;\">ATS Score</td><td style=\"padding:8px;\">{{ $json[\"ATS_Score\"] }} / 100</td></tr>\n<tr><td style=\"padding:8px;font-weight:bold;\">Skills Match</td><td style=\"padding:8px;\">{{ $json[\"Skills_Match\"] }} / 100</td></tr>\n<tr style=\"background:#f5f5f5;\"><td style=\"padding:8px;font-weight:bold;\">PAR Rating</td><td style=\"padding:8px;\">{{ $json[\"PAR_Rating\"] }} / 100</td></tr>\n<tr><td style=\"padding:8px;font-weight:bold;\">Experience Clarity</td><td style=\"padding:8px;\">{{ $json[\"Experience_Clarity\"] }} / 100</td></tr>\n<tr style=\"background:#e8f5e9;\"><td style=\"padding:8px;font-weight:bold;\">Overall Grade</td><td style=\"padding:8px;font-weight:bold;\">{{ $json[\"Overall_Grade\"] }} / 100</td></tr>\n<tr style=\"background:#c8e6c9;\"><td style=\"padding:8px;font-weight:bold;\">Recommendation</td><td style=\"padding:8px;font-weight:bold;color:#2e7d32;\">{{ $json[\"Recommendation\"] }}</td></tr>\n<tr><td style=\"padding:8px;font-weight:bold;\">Top Strength</td><td style=\"padding:8px;\">{{ $json[\"Top_Strength\"] }}</td></tr>\n<tr style=\"background:#f5f5f5;\"><td style=\"padding:8px;font-weight:bold;\">Main Gap</td><td style=\"padding:8px;\">{{ $json[\"Main_Gap\"] }}</td></tr>\n</table>\n<p style=\"color:#666;font-size:12px;margin-top:16px;\">Sent automatically by Resume Evaluation Pipeline</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        -1040
+      ],
+      "id": "adba4ae1-22a1-4f54-9726-fe5f8157d36e",
+      "name": "Send a message",
+      "webhookId": "3ea01986-0ead-4d7c-86fe-298a041c859f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "45lo6HDXfotF5rci",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from pdf": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "21700b24-a623-4632-9749-c057f07f0261",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8668b25e517bb937b1fd35ac474b327bc525113fba28db2e82be3f87af524dc6"
+  },
+  "id": "8UNOqOphXdtNU6qY",
+  "tags": []
+}
